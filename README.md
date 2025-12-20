@@ -2,7 +2,7 @@
 
 Smart Personal Task Manager - Backend API
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -53,7 +53,7 @@ mvn spring-boot:run
 
 The API will be available at `http://localhost:8080`
 
-## 🐳 Docker Setup
+## Docker Setup
 
 The `docker-compose.yaml` includes:
 
@@ -66,7 +66,7 @@ The `docker-compose.yaml` includes:
 - Admin Username: `admin`
 - Admin Password: `admin`
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 backend/
@@ -88,7 +88,7 @@ backend/
 └── README.md
 ```
 
-## 🔧 Configuration
+## Configuration
 
 ### application.properties
 
@@ -108,21 +108,8 @@ sptm.app.jwtSecret=${JWT_SECRET:default-secret-change-in-production}
 sptm.app.jwtExpirationMs=${JWT_EXPIRATION_MS:86400000}
 ```
 
-## 🔐 Google Calendar Integration (Optional)
 
-To enable Google Calendar sync:
-
-1. Create a Google Cloud project
-2. Enable Google Calendar API
-3. Download OAuth 2.0 credentials
-4. Place `credentials.json` in `src/main/resources/`
-5. Set environment variables:
-   ```bash
-   GOOGLE_CLIENT_ID=your-client-id
-   GOOGLE_CLIENT_SECRET=your-client-secret
-   ```
-
-## 📡 API Endpoints
+## API Endpoints
 
 ### Authentication
 - `POST /api/auth/register` - Register new user
@@ -145,7 +132,7 @@ To enable Google Calendar sync:
 ### Analytics
 - `GET /api/analytics/weekly/{userId}` - Get weekly statistics
 
-## 🧪 Testing
+## Testing
 
 ```bash
 # Run all tests
@@ -155,7 +142,7 @@ mvn test
 mvn test jacoco:report
 ```
 
-## 🛠️ Development
+## Development
 
 ### Database Access
 
@@ -174,7 +161,7 @@ docker exec -it sptm-postgres psql -U sptmuser -d sptmdb
 
 Use Spring Boot DevTools for automatic restart during development.
 
-## 📦 Production Build
+## Production Build
 
 ```bash
 # Create production JAR
@@ -184,7 +171,7 @@ mvn clean package -DskipTests
 java -jar target/backend-0.0.1-SNAPSHOT.jar
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Port Already in Use
 ```bash
@@ -204,11 +191,11 @@ docker ps | grep postgres
 docker-compose restart postgres
 ```
 
-## 📝 License
+## License
 
 This project is part of the SPTM (Smart Personal Task Manager) system.
 
-## 👥 Contributors
+## Contributors
 
 - Backend Team
 
