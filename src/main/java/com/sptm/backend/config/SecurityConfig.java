@@ -15,7 +15,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthTokenFilter authTokenFilter) throws Exception {
         http.cors(cors -> cors.configurationSource(request -> {
             var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-            corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:5173"));
+            corsConfiguration.setAllowedOrigins(
+                    java.util.List.of("http://localhost:5173", "https://smartpersonaltaskmanager.netlify.app"));
             corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
             return corsConfiguration;
