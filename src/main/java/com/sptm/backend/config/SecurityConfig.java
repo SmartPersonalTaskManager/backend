@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 "/h2-console/**",
                                 "/")
                         .permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                         .anyRequest().authenticated())
 
                 .headers(headers -> headers.frameOptions(frame -> frame.disable())) // For H2 Console
