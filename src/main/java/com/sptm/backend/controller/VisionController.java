@@ -20,13 +20,15 @@ public class VisionController {
     }
 
     @PostMapping
-    public ResponseEntity<Vision> createVision(@RequestParam Long userId, @RequestBody String text) {
-        return ResponseEntity.ok(visionService.createVision(userId, text));
+    public ResponseEntity<Vision> createVision(@RequestParam Long userId,
+            @RequestBody java.util.Map<String, String> payload) {
+        return ResponseEntity.ok(visionService.createVision(userId, payload.get("text")));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Vision> updateVision(@PathVariable Long id, @RequestBody String text) {
-        return ResponseEntity.ok(visionService.updateVision(id, text));
+    public ResponseEntity<Vision> updateVision(@PathVariable Long id,
+            @RequestBody java.util.Map<String, String> payload) {
+        return ResponseEntity.ok(visionService.updateVision(id, payload.get("text")));
     }
 
     @DeleteMapping("/{id}")

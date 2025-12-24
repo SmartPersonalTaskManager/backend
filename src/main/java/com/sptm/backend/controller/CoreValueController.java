@@ -20,13 +20,15 @@ public class CoreValueController {
     }
 
     @PostMapping
-    public ResponseEntity<CoreValue> createCoreValue(@RequestParam Long userId, @RequestBody String text) {
-        return ResponseEntity.ok(coreValueService.createCoreValue(userId, text));
+    public ResponseEntity<CoreValue> createCoreValue(@RequestParam Long userId,
+            @RequestBody java.util.Map<String, String> payload) {
+        return ResponseEntity.ok(coreValueService.createCoreValue(userId, payload.get("text")));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CoreValue> updateCoreValue(@PathVariable Long id, @RequestBody String text) {
-        return ResponseEntity.ok(coreValueService.updateCoreValue(id, text));
+    public ResponseEntity<CoreValue> updateCoreValue(@PathVariable Long id,
+            @RequestBody java.util.Map<String, String> payload) {
+        return ResponseEntity.ok(coreValueService.updateCoreValue(id, payload.get("text")));
     }
 
     @DeleteMapping("/{id}")

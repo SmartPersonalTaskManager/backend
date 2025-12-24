@@ -25,25 +25,15 @@ public class VisionService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Vision vision = new Vision();
         vision.setUser(user);
-        vision.setText(cleanText(text));
+        vision.setText(text);
         return visionRepository.save(vision);
     }
 
     public Vision updateVision(Long id, String text) {
         Vision vision = visionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vision not found"));
-        vision.setText(cleanText(text));
+        vision.setText(text);
         return visionRepository.save(vision);
-    }
-
-    private String cleanText(String text) {
-        if (text == null)
-            return null;
-        String cleaned = text.trim();
-        if (cleaned.startsWith("\"") && cleaned.endsWith("\"") && cleaned.length() >= 2) {
-            cleaned = cleaned.substring(1, cleaned.length() - 1);
-        }
-        return cleaned.replace("\\n", "\n");
     }
 
     public void deleteVision(Long id) {
