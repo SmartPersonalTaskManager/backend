@@ -55,4 +55,26 @@ public class AuthController {
 
         return ResponseEntity.ok("User registered successfully!");
     }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> googleLogin(@RequestBody java.util.Map<String, String> payload) {
+        String email = payload.get("email");
+        // String name = payload.get("name");
+        // String photoUrl = payload.get("photoUrl"); // Optional, if we add photo to
+        // User model later
+
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if (user == null) {
+            // Register new user
+            user = new User();
+            user.setEmail(email);
+            user.setUsername(email); // Use email as username for simplicity and uniqueness
+            user.setPasswordHash("GOOGLE_AUTH_USER"); // Placeholder for Google users
+            userRepository.save(user);
+        }
+
+        String jwt = jwtUtils.generateJwtToken(user.getUsername());
+        return ResponseEntity.ok(new AuthResponse(jwt, user.getId(), user.getUsername(), user.getEmail()));
+    }
 }

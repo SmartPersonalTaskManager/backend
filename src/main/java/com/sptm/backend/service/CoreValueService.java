@@ -7,15 +7,19 @@ import com.sptm.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
+@Transactional
 public class CoreValueService {
     @Autowired
     private CoreValueRepository coreValueRepository;
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<CoreValue> getCoreValuesByUserId(Long userId) {
         return coreValueRepository.findByUserId(userId);
     }

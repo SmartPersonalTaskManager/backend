@@ -7,15 +7,19 @@ import com.sptm.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
+@Transactional
 public class VisionService {
     @Autowired
     private VisionRepository visionRepository;
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<Vision> getVisionsByUserId(Long userId) {
         return visionRepository.findByUserId(userId);
     }
