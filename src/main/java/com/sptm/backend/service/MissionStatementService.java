@@ -76,6 +76,16 @@ public class MissionStatementService {
     }
 
     @Transactional
+    public SubMissionDTO updateSubMission(Long subMissionId, String title) {
+        SubMission subMission = subMissionRepository.findById(subMissionId)
+                .orElseThrow(() -> new RuntimeException("SubMission not found"));
+
+        subMission.setTitle(title);
+        subMission = subMissionRepository.save(subMission);
+        return convertToSubMissionDTO(subMission);
+    }
+
+    @Transactional
     public void deleteMission(Long missionId) {
         MissionStatement mission = missionRepository.findById(missionId)
                 .orElseThrow(() -> new RuntimeException("Mission not found"));

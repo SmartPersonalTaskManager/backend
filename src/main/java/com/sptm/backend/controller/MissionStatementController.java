@@ -38,6 +38,13 @@ public class MissionStatementController {
         return ResponseEntity.ok(missionService.updateMission(missionId, content));
     }
 
+    @PutMapping("/submissions/{subMissionId}")
+    public ResponseEntity<SubMissionDTO> updateSubMission(@PathVariable Long subMissionId,
+            @RequestBody String content) {
+        // content is just the raw string body
+        return ResponseEntity.ok(missionService.updateSubMission(subMissionId, content));
+    }
+
     @DeleteMapping("/{missionId}")
     public ResponseEntity<Void> deleteMission(@PathVariable Long missionId) {
         missionService.deleteMission(missionId);
