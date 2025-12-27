@@ -95,7 +95,7 @@ public class CalendarService {
                 .setRedirectUri(redirectUri)
                 .execute();
 
-        String refreshToken = response.getRefreshAccessToken();
+        String refreshToken = response.getRefreshToken();
         if (refreshToken != null) {
             user.setGoogleRefreshToken(refreshToken);
             userRepository.save(user);
