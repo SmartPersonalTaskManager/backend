@@ -23,4 +23,7 @@ public class User {
 
     @Column(nullable = false)
     private String passwordHash;
+
+    @Column(length = 1000) // Refresh tokens can be long
+    private String googleRefreshToken;
 }

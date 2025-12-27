@@ -23,13 +23,39 @@ public class CalendarController {
         }
     }
 
+    @Autowired
+    private com.sptm.backend.repository.UserRepository userRepository;
+
     @PostMapping("/sync")
-    public ResponseEntity<String> syncCalendar(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<String> syncCalendar(@RequestBody Map<String, String> payload,
+            org.springframework.security.core.Authentication authentication) {
         String code = payload.get("code");
         if (code == null) {
             return ResponseEntity.badRequest().body("Auth code is required");
         }
-        calendarService.syncEvents(code);
-        return ResponseEntity.ok("Sync started");
+
+        try {
+            String email = (String) authentication.getPrincipal();
+            com.sptm.backend.model.User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            calendarService.syncEvents(user.getId(), code);
+            return ResponseEntity.ok("Sync started");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Sync failed: " + e.getMessage());
+        }
+    }
+
+    @Autowired
+    private com.sptm.backend.repository.CalendarEventRepository calendarEventRepository;
+
+    @GetMapping("/events")
+    public ResponseEntity<java.util.List<com.sptm.backend.model.CalendarEvent>> getEvents(
+            org.springframework.security.core.Authentication authentication) {
+        String email = (String) authentication.getPrincipal();
+        com.sptm.backend.model.User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ResponseEntity.ok(calendarEventRepository.findByUserId(user.getId()));
     }
 }
