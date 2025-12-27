@@ -28,9 +28,14 @@ public class JwtUtils {
     }
 
     private Key key() {
-        // In production, use standard Base64 decoding of a secure secret
-        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(
-                "SecretKeyToGenJWTsMustBeLongerThan256bitsForHS512AlgorithmSecretKeyToGenJWTsMustBeLongerThan256bitsForHS512Algorithm"));
+        byte[] keyBytes;
+        try {
+            keyBytes = Decoders.BASE64.decode(jwtSecret);
+        } catch (IllegalArgumentException e) {
+            // Fallback if secret is not Base64 encoded (e.g. plain text during dev)
+            keyBytes = jwtSecret.getBytes();
+        }
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String getUserNameFromJwtToken(String token) {
