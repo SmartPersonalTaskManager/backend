@@ -8,26 +8,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ContextTagService {
+    private static final Logger logger = LoggerFactory.getLogger(ContextTagService.class);
+
     @Autowired
     private ContextTagRepository contextTagRepository;
     @Autowired
     private UserRepository userRepository;
 
+    @Transactional(readOnly = true)
     public List<ContextTag> getContextTagsByUserId(Long userId) {
-        return contextTagRepository.findByUserId(userId);
+        logger.info("Fetching contexts for userId: {}", userId);
+        List<ContextTag> tags = contextTagRepository.findByUserId(userId);
+        logger.info("Found {} contexts for userId: {}", tags.size(), userId);
+        return tags;
     }
 
+    @Transactional
     public ContextTag createContextTag(Long userId, String name, String icon) {
+        logger.info("Creating context for userId: {}, name: {}", userId, name);
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
         ContextTag contextTag = new ContextTag();
         contextTag.setUser(user);
         contextTag.setName(name);
         contextTag.setIcon(icon);
-        return contextTagRepository.save(contextTag);
+        ContextTag saved = contextTagRepository.save(contextTag);
+        logger.info("Saved context id: {}", saved.getId());
+        return saved;
     }
 
     public void deleteContextTag(Long id) {
