@@ -4,7 +4,7 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.auth.oauth2.TokenResponse;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
@@ -23,12 +23,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Collections;
+import com.google.api.services.calendar.model.EventDateTime;
+import com.sptm.backend.repository.TaskRepository;
 import java.util.List;
 
 @Service
@@ -55,6 +55,9 @@ public class CalendarService {
 
     @Autowired
     private NetHttpTransport httpTransport;
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     private GoogleAuthorizationCodeFlow flow;
 
@@ -151,5 +154,68 @@ public class CalendarService {
                 calendarEventRepository.save(calendarEvent);
             }
         }
+    }
+
+    public void addTaskToGoogleCalendar(Long userId, Long taskId) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        com.sptm.backend.model.Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (user.getGoogleRefreshToken() == null) {
+            throw new RuntimeException("User is not connected to Google Calendar");
+        }
+
+        Credential credential = getCredential(userId, user.getGoogleRefreshToken());
+        Calendar service = new Calendar.Builder(httpTransport, JSON_FACTORY, credential)
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        Event event = new Event()
+                .setSummary(task.getTitle())
+                .setDescription(task.getDescription());
+
+        if (task.getDueDate() != null) {
+            DateTime startDateTime = new DateTime(
+                    java.util.Date.from(task.getDueDate().atZone(ZoneId.systemDefault()).toInstant()));
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone(ZoneId.systemDefault().getId());
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime(
+                    java.util.Date.from(task.getDueDate().plusHours(1).atZone(ZoneId.systemDefault()).toInstant()));
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone(ZoneId.systemDefault().getId());
+            event.setEnd(end);
+        } else {
+            // Default to all day today if no due date? Or skip?
+            // Google Calendar events usually need a time.
+            // Let's use now + 1 hour if no due date, or maybe throw error.
+            throw new RuntimeException("Task must have a due date to be synced.");
+        }
+
+        Event createdEvent = service.events().insert("primary", event).execute();
+
+        task.setCalendarEventId(createdEvent.getId());
+        taskRepository.save(task);
+    }
+
+    private Credential getCredential(Long userId, String refreshToken) throws IOException {
+        Credential credential = flow.loadCredential(userId.toString());
+        if (credential != null && (credential.getRefreshToken() != null || credential.getExpiresInSeconds() > 60)) {
+            return credential;
+        }
+
+        // Create new credential from refresh token
+        TokenResponse tokenResponse = new TokenResponse();
+        tokenResponse.setRefreshToken(refreshToken);
+        // We set attributes that indicate it's a bearer token type
+        tokenResponse.setTokenType("Bearer");
+        // We can lets the flow refresh it automatically
+
+        return flow.createAndStoreCredential(tokenResponse, userId.toString());
     }
 }
