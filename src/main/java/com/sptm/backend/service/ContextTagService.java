@@ -34,6 +34,7 @@ public class ContextTagService {
         logger.info("Creating context for userId: {}, name: {}", userId, name);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+        logger.info("Associating context with username: {}", user.getUsername());
         ContextTag contextTag = new ContextTag();
         contextTag.setUser(user);
         contextTag.setName(name);
