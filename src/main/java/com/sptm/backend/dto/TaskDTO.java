@@ -14,7 +14,6 @@ public class TaskDTO {
     private Task.TaskPriority priority;
     private Task.TaskStatus status;
     private Long subMissionId;
-    private Long missionId;
     private Long userId;
 
     // Additional fields for Covey Matrix inputs if needed

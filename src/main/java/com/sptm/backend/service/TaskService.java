@@ -47,7 +47,6 @@ public class TaskService {
             SubMission subMission = subMissionRepository.findById(taskDTO.getSubMissionId())
                     .orElseThrow(() -> new RuntimeException("SubMission not found"));
             task.setSubMission(subMission);
-            task.setMission(subMission.getMissionStatement());
         }
 
         // Covey Logic
@@ -96,9 +95,6 @@ public class TaskService {
         if (task.getSubMission() != null) {
             dto.setSubMissionId(task.getSubMission().getId());
         }
-        if (task.getMission() != null) {
-            dto.setMissionId(task.getMission().getId());
-        }
         return dto;
     }
 
@@ -133,14 +129,6 @@ public class TaskService {
             task.setPriority(taskDTO.getPriority());
         } else if (taskDTO.isUrgent() || taskDTO.isImportant()) {
             task.setPriority(determinePriority(taskDTO.isUrgent(), taskDTO.isImportant()));
-        }
-
-        // Update SubMission and Mission if provided
-        if (taskDTO.getSubMissionId() != null) {
-            SubMission subMission = subMissionRepository.findById(taskDTO.getSubMissionId())
-                    .orElseThrow(() -> new RuntimeException("SubMission not found"));
-            task.setSubMission(subMission);
-            task.setMission(subMission.getMissionStatement());
         }
 
         task = taskRepository.save(task);
