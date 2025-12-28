@@ -46,6 +46,20 @@ public class CalendarController {
         }
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshCalendar(org.springframework.security.core.Authentication authentication) {
+        try {
+            String email = (String) authentication.getPrincipal();
+            com.sptm.backend.model.User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            java.util.List<com.sptm.backend.model.CalendarEvent> events = calendarService.fetchEvents(user.getId());
+            return ResponseEntity.ok(events);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Refresh failed: " + e.getMessage());
+        }
+    }
+
     @Autowired
     private com.sptm.backend.repository.CalendarEventRepository calendarEventRepository;
 

@@ -102,14 +102,24 @@ public class CalendarService {
         if (refreshToken != null) {
             user.setGoogleRefreshToken(refreshToken);
             userRepository.save(user);
-        } else if (user.getGoogleRefreshToken() == null) {
-            // If we didn't get a refresh token and don't have one, we might need to prompt
-            // user to revoke access to get a new one
-            // or use "prompt=consent" in auth url.
         }
 
         Credential credential = flow.createAndStoreCredential(response, userId.toString());
         fetchAndSaveEvents(user, credential);
+    }
+
+    public List<CalendarEvent> fetchEvents(Long userId) throws IOException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getGoogleRefreshToken() == null) {
+            throw new RuntimeException("User is not connected to Google Calendar");
+        }
+
+        Credential credential = getCredential(userId, user.getGoogleRefreshToken());
+        fetchAndSaveEvents(user, credential);
+
+        return calendarEventRepository.findByUserId(userId);
     }
 
     private void fetchAndSaveEvents(User user, Credential credential) throws IOException {
