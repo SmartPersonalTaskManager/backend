@@ -192,23 +192,24 @@ public class CalendarService {
                 .setDescription(task.getDescription());
 
         if (task.getDueDate() != null) {
-            DateTime startDateTime = new DateTime(
-                    java.util.Date.from(task.getDueDate().atZone(ZoneId.systemDefault()).toInstant()));
+            // Create all-day event using date format (YYYY-MM-DD)
+            String dateStr = task.getDueDate().toLocalDate().toString(); // Returns YYYY-MM-DD
+
+            // For all-day events, use DateTime with date-only format
+            DateTime startDate = new DateTime(dateStr);
             EventDateTime start = new EventDateTime()
-                    .setDateTime(startDateTime)
+                    .setDate(startDate) // setDate for all-day event
                     .setTimeZone(ZoneId.systemDefault().getId());
             event.setStart(start);
 
-            DateTime endDateTime = new DateTime(
-                    java.util.Date.from(task.getDueDate().plusHours(1).atZone(ZoneId.systemDefault()).toInstant()));
+            // End date should be the next day for all-day events
+            String endDateStr = task.getDueDate().toLocalDate().plusDays(1).toString();
+            DateTime endDate = new DateTime(endDateStr);
             EventDateTime end = new EventDateTime()
-                    .setDateTime(endDateTime)
+                    .setDate(endDate) // setDate for all-day event
                     .setTimeZone(ZoneId.systemDefault().getId());
             event.setEnd(end);
         } else {
-            // Default to all day today if no due date? Or skip?
-            // Google Calendar events usually need a time.
-            // Let's use now + 1 hour if no due date, or maybe throw error.
             throw new RuntimeException("Task must have a due date to be synced.");
         }
 
