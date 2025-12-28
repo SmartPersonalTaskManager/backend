@@ -102,10 +102,15 @@ public class CalendarService {
         if (refreshToken != null) {
             user.setGoogleRefreshToken(refreshToken);
             userRepository.save(user);
+            System.out.println("Google Calendar connected for user: " + user.getUsername());
+        } else {
+            System.out.println("Warning: No refresh token received for user: " + user.getUsername());
         }
 
-        Credential credential = flow.createAndStoreCredential(response, userId.toString());
-        fetchAndSaveEvents(user, credential);
+        // Store credential for future use
+        flow.createAndStoreCredential(response, userId.toString());
+        // Note: We don't fetch events here - that will be done when user explicitly
+        // requests
     }
 
     public List<CalendarEvent> fetchEvents(Long userId) throws IOException {
