@@ -74,11 +74,11 @@ public class CalendarController {
     }
 
     @PostMapping("/push-task")
-    public ResponseEntity<String> pushTask(@RequestBody Map<String, Long> payload,
+    public ResponseEntity<?> pushTask(@RequestBody Map<String, Long> payload,
             org.springframework.security.core.Authentication authentication) {
         Long taskId = payload.get("taskId");
         if (taskId == null) {
-            return ResponseEntity.badRequest().body("Task ID is required");
+            return ResponseEntity.badRequest().body(Map.of("error", "Task ID is required"));
         }
 
         try {
@@ -87,9 +87,9 @@ public class CalendarController {
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             calendarService.addTaskToGoogleCalendar(user.getId(), taskId);
-            return ResponseEntity.ok("Task synced to Google Calendar");
+            return ResponseEntity.ok(Map.of("message", "Task synced to Google Calendar"));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Sync failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", "Sync failed: " + e.getMessage()));
         }
     }
 }
