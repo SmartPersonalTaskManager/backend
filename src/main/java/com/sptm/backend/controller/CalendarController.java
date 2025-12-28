@@ -35,9 +35,9 @@ public class CalendarController {
         }
 
         try {
-            String email = (String) authentication.getPrincipal();
-            com.sptm.backend.model.User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            String username = (String) authentication.getPrincipal();
+            com.sptm.backend.model.User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
             calendarService.syncEvents(user.getId(), code);
             return ResponseEntity.ok("Sync started");
@@ -49,9 +49,9 @@ public class CalendarController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshCalendar(org.springframework.security.core.Authentication authentication) {
         try {
-            String email = (String) authentication.getPrincipal();
-            com.sptm.backend.model.User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            String username = (String) authentication.getPrincipal();
+            com.sptm.backend.model.User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
             java.util.List<com.sptm.backend.model.CalendarEvent> events = calendarService.fetchEvents(user.getId());
             return ResponseEntity.ok(events);
@@ -66,9 +66,9 @@ public class CalendarController {
     @GetMapping("/events")
     public ResponseEntity<java.util.List<com.sptm.backend.model.CalendarEvent>> getEvents(
             org.springframework.security.core.Authentication authentication) {
-        String email = (String) authentication.getPrincipal();
-        com.sptm.backend.model.User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        String username = (String) authentication.getPrincipal();
+        com.sptm.backend.model.User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
         return ResponseEntity.ok(calendarEventRepository.findByUserId(user.getId()));
     }
@@ -82,9 +82,9 @@ public class CalendarController {
         }
 
         try {
-            String email = (String) authentication.getPrincipal();
-            com.sptm.backend.model.User user = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            String username = (String) authentication.getPrincipal();
+            com.sptm.backend.model.User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
             calendarService.addTaskToGoogleCalendar(user.getId(), taskId);
             return ResponseEntity.ok(Map.of("message", "Task synced to Google Calendar"));
