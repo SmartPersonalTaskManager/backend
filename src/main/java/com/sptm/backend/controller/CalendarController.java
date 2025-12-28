@@ -63,6 +63,17 @@ public class CalendarController {
     @Autowired
     private com.sptm.backend.repository.CalendarEventRepository calendarEventRepository;
 
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getConnectionStatus(
+            org.springframework.security.core.Authentication authentication) {
+        String username = (String) authentication.getPrincipal();
+        com.sptm.backend.model.User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
+        boolean isConnected = user.getGoogleRefreshToken() != null && !user.getGoogleRefreshToken().isEmpty();
+        return ResponseEntity.ok(Map.of("connected", isConnected));
+    }
+
     @GetMapping("/events")
     public ResponseEntity<java.util.List<com.sptm.backend.model.CalendarEvent>> getEvents(
             org.springframework.security.core.Authentication authentication) {
