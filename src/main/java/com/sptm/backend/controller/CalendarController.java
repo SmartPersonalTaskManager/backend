@@ -27,11 +27,11 @@ public class CalendarController {
     private com.sptm.backend.repository.UserRepository userRepository;
 
     @PostMapping("/sync")
-    public ResponseEntity<String> syncCalendar(@RequestBody Map<String, String> payload,
+    public ResponseEntity<Map<String, String>> syncCalendar(@RequestBody Map<String, String> payload,
             org.springframework.security.core.Authentication authentication) {
         String code = payload.get("code");
         if (code == null) {
-            return ResponseEntity.badRequest().body("Auth code is required");
+            return ResponseEntity.badRequest().body(Map.of("error", "Auth code is required"));
         }
 
         try {
@@ -40,9 +40,9 @@ public class CalendarController {
                     .orElseThrow(() -> new RuntimeException("User not found: " + username));
 
             calendarService.syncEvents(user.getId(), code);
-            return ResponseEntity.ok("Sync started");
+            return ResponseEntity.ok(Map.of("message", "Sync started", "status", "success"));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Sync failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", "Sync failed: " + e.getMessage()));
         }
     }
 
@@ -56,7 +56,7 @@ public class CalendarController {
             java.util.List<com.sptm.backend.model.CalendarEvent> events = calendarService.fetchEvents(user.getId());
             return ResponseEntity.ok(events);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Refresh failed: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(Map.of("error", "Refresh failed: " + e.getMessage()));
         }
     }
 
